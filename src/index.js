@@ -1,48 +1,57 @@
 import "./pages/index.css";
-import { createCard, deleteCardConfirmation, likeCard, handleCardFormDeleteConfirm } from "./components/card.js";
+import { createCard, likeCard } from "./components/card.js";
 import { closeModal, openModal } from "./components/modal.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
-import { getInitialCardsApi, getUserInfoApi, addNewCardApi, updateUserAvatarApi, updateUserInfoApi } from './components/api.js'
-import { validationConfig } from './components/validation-config.js'
+import { getInitialCardsApi, getUserInfoApi, addNewCardApi, updateUserAvatarApi, updateUserInfoApi } from './components/api.js';
+import { validationConfig } from './components/validation-config.js';
 
 // DOM
 const container = document.querySelector('.places');
-const cardsPlaces = container.querySelector('.places__list')
+const cardsPlaces = container.querySelector('.places__list');
+
 // Modal popup_type_image
 const popupImage = document.querySelector('.popup_type_image');
 const imageElement = document.querySelector('.popup__image');
 const captionElement = document.querySelector('.popup__caption');
+
 // Modal popup_type_edit
 const popupEditProfile = document.querySelector('.popup_type_edit');
 const popupEditProfileButton = document.querySelector('.profile__edit-button');
+
 // Modal popup_type_new-card
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupNewCardButton = document.querySelector('.profile__add-button');
+
 // Modal popup_type_edit-avatar
 const popupEditAvatar = document.querySelector('.popup_type_edit-avatar');
 const avatarImage = document.querySelector('.profile__image');
+
 // Modal popup_type_delete-confirm
-export const popupDeleteConfirm = document.querySelector('.popup_type_delete-confirm');
+const popupDeleteConfirm = document.querySelector('.popup_type_delete-confirm');
+const formDeleteConfirm = document.forms['delete-confirm'];
+const formDeleteConfirmButton = formDeleteConfirm.querySelector('.popup__button');
+
 // Close buttons
 const closeButtons = document.querySelectorAll('.popup__close');
+
 // Forms
 // edit-profile
 const formProfileElement = document.forms['edit-profile'];
 const nameProfileInput = formProfileElement.elements.name;
 const jobProfileInput = formProfileElement.elements.description;
-const formProfileButton = formProfileElement.querySelector('.popup__button')
+const formProfileButton = formProfileElement.querySelector('.popup__button');
+
 // new-place
 const formCardElement = document.forms['new-place'];
 const nameCardInput = formCardElement.elements['place-name'];
 const jobCardInput = formCardElement.elements.link;
-const formCardButton = formCardElement.querySelector('.popup__button')
+const formCardButton = formCardElement.querySelector('.popup__button');
+
 // edit-avatar
 const formAvatarElement = document.forms['edit-avatar'];
 const jobAvatarInput = formAvatarElement.elements.avatarlink;
-const formAvatarButton = formAvatarElement.querySelector('.popup__button')
-// delete-confirm
-const formDeleteConfirm = document.forms['delete-confirm'];
-const formDeleteConfirmButton = formDeleteConfirm.querySelector('.popup__button');
+const formAvatarButton = formAvatarElement.querySelector('.popup__button');
+
 // porofile-title
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
@@ -64,7 +73,7 @@ Promise.all(promises)
   })
   .then(([userId, cards]) => {
     cards.forEach(function (element) {
-        const card = createCard(element, deleteCardConfirmation, likeCard, openPreviewImage, userId);
+        const card = createCard(element, likeCard, openPreviewImage, userId);
         cardsPlaces.append(card);
     });
   })
@@ -81,7 +90,7 @@ function openPreviewImage(imageLink, imageName) {
 
 function renderLoading(isLoading, button) {
     button.textContent = isLoading ? 'Сохранение...' : 'Сохранить'
-  }
+}
 
 // Обработчик «отправки» формы профиля
 function handleProfileFormSubmit(evt) {
@@ -100,7 +109,6 @@ function handleProfileFormSubmit(evt) {
         console.error("Ошибка при изменении данных пользователя:", err);
     })
     .finally(() => renderLoading(false, formProfileButton));
-
 }
 
 formProfileElement.addEventListener('submit', handleProfileFormSubmit);
@@ -133,7 +141,7 @@ function handleCardFormSubmit(evt) {
     renderLoading(true, formCardButton);
     addNewCardApi(newCardName, newCardLink)
         .then((res) => {
-            const newCard = createCard(res, deleteCard, likeCard, openPreviewImage, userId);
+            const newCard = createCard(res, likeCard, openPreviewImage, userId);
             cardsPlaces.prepend(newCard);
             closeModal(popupNewCard);
             formCardElement.reset();
@@ -141,12 +149,39 @@ function handleCardFormSubmit(evt) {
         .catch((err) => {
             console.error("Ошибка при добавлении карточки:", err);
         })
-        .finally(() => renderLoading(false,formCardButton));
+        .finally(() => renderLoading(false, formCardButton));
 }
 
 formCardElement.addEventListener('submit', handleCardFormSubmit);
 
-// Слушатель отправки формы подтверждения удаления карточки
+// Функция для подтверждения удаления карточки
+let cardElementForConfirm;
+let cardIdForConfirm;
+
+function deleteCardConfirmation(cardId, cardElement) {
+    cardElementForConfirm = cardElement;
+    cardIdForConfirm = cardId;
+    openModal(popupDeleteConfirm);
+}
+
+// Обработчик «отправки» формы подтверждения удаления карточки
+function handleCardFormDeleteConfirm(evt) {
+    evt.preventDefault();
+    deleteCard(cardIdForConfirm, cardElementForConfirm);
+}
+
+// Функция удаления карточки
+function deleteCard(cardId, cardElement) {
+    deleteCardApi(cardId)
+    .then((res) => {
+        cardElement.remove();
+        closeModal(popupDeleteConfirm);
+    })
+    .catch((err) => {
+        console.error("Ошибка при удалении поста:", err);
+    });
+}
+
 formDeleteConfirm.addEventListener('submit', handleCardFormDeleteConfirm);
 
 // Открыть модальное окно редактирования ссылки аватара
@@ -156,7 +191,7 @@ avatarImage.addEventListener('click', function() {
 });
 
 // Открыть модальное окно добавления новой карточки
-popupNewCardButton.addEventListener('click', function (){
+popupNewCardButton.addEventListener('click', function () {
     clearValidation(popupNewCard, validationConfig);
     openModal(popupNewCard);
 });
