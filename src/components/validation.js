@@ -1,5 +1,3 @@
-import { validationConfig } from './validation-config.js'
-
 const showInputError = (formElement, inputElement, errorMessage, validationConfig) => {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
     inputElement.classList.add(validationConfig.inputErrorClass);
