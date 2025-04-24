@@ -4,7 +4,7 @@ import { addLikeCardApi, deleteLikeCardApi } from './api.js';
 const cardTemplate = document.querySelector('#card-template').content;
 
 // Функция создания карточки
-export function createCard(element, likeCard, openPreviewImage, userId) {
+export function createCard(element, deleteCardConfirmation, likeCard, openPreviewImage, userId) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image');
     const cardTitle = cardElement.querySelector('.card__title');
@@ -23,6 +23,8 @@ export function createCard(element, likeCard, openPreviewImage, userId) {
 
     if(userId !== cardOwnerId) {
         cardDeleteButton.style.display = 'none';  // Скрыть кнопку удаления, если карточка не принадлежит текущему пользователю
+    } else {
+        cardDeleteButton.addEventListener('click', () => deleteCardConfirmation(cardId, cardElement));
     }
 
     if (ownerSetLike) {

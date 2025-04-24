@@ -73,7 +73,7 @@ Promise.all(promises)
   })
   .then(([userId, cards]) => {
     cards.forEach(function (element) {
-        const card = createCard(element, likeCard, openPreviewImage, userId);
+        const card = createCard(element, deleteCardConfirmation, likeCard, openPreviewImage, userId);
         cardsPlaces.append(card);
     });
   })
@@ -141,7 +141,7 @@ function handleCardFormSubmit(evt) {
     renderLoading(true, formCardButton);
     addNewCardApi(newCardName, newCardLink)
         .then((res) => {
-            const newCard = createCard(res, likeCard, openPreviewImage, userId);
+            const newCard = createCard(res, deleteCardConfirmation, likeCard, openPreviewImage, userId);
             cardsPlaces.prepend(newCard);
             closeModal(popupNewCard);
             formCardElement.reset();
