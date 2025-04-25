@@ -4,6 +4,7 @@ import { closeModal, openModal } from "./components/modal.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
 import { getInitialCardsApi, getUserInfoApi, addNewCardApi, updateUserAvatarApi, updateUserInfoApi } from './components/api.js';
 import { validationConfig } from './components/validation-config.js';
+import { deleteCardApi } from './components/api.js';
 
 // DOM
 const container = document.querySelector('.places');
